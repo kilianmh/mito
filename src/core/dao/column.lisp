@@ -67,6 +67,8 @@
     (etypecase value
       (integer
        (local-time:universal-to-timestamp value))
+      (local-time:timestamp
+       value)
       (float
        (multiple-value-bind (sec nsec)
            (truncate value)
