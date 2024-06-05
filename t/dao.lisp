@@ -401,3 +401,27 @@
   (child-parent (mito:find-dao 'child))
   (ok (object= (child-parent (mito:find-dao 'child))
                (mito:find-dao 'parent))))
+#|
+(defpackage #:mito-test.dao.7
+  (:use #:cl
+        #:rove
+        #:mito.dao
+        #:mito.connection
+        #:mito-test.util
+        #:sxql)
+  (:import-from #:alexandria
+                #:make-keyword
+                #:compose))
+(in-package #:mito-test.dao.7)
+
+(deftable user ()
+  ((name :col-type (:varchar 64))
+   (email :col-type (or (:varchar 128) :null))))
+
+(deftable tweet ()
+  ((status :col-type :text)
+   (user user)))
+
+(deftest deftable
+  )
+|#

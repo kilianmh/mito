@@ -382,9 +382,21 @@
       (mapc #'execute-sql (table-definition class)))))
 
 (defmacro deftable (name direct-superclasses direct-slots &rest options)
-  `(defclass ,name ,direct-superclasses
-     ,direct-slots
-     (:metaclass dao-table-class)
-     ,@(unless (find :conc-name options :key #'car)
-               `((:conc-name ,(intern (format nil "~@:(~A-~)" name) (symbol-package name)))))
-     ,@options))
+  (flet ((expand-slot (rest)
+	   (let ((second
+		   (second rest)))
+	     (if (and (keywordp second)
+		      (member second
+			      (list :col-type :primary-key :inflate :deflate :ghost
+					      :references :reader :writer :accessor :allocation
+				    :initarg :initform :type :documentation)))
+		 rest
+		 (cons (first rest)
+		       (append (list :col-type second)
+			       (cddr rest)))))))
+    `(defclass ,name ,direct-superclasses
+       ,(mapcar #'expand-slot direct-slots)
+       (:metaclass dao-table-class)
+       ,@(unless (find :conc-name options :key #'car)
+	   `((:conc-name ,(intern (format nil "~@:(~A-~)" name) (symbol-package name)))))
+       ,@options)))
